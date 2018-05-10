@@ -463,7 +463,7 @@ public class MybatisGeneratorBridge {
             }
         }
 
-        File mapperJavaFile = new File(mapperConfig.getTargetProject() + "\\" + mapperConfig.getTargetPackage().replace(".", "\\") + "\\" + fileName + "Mapper.java");
+        File mapperJavaFile = new File(daoConfig.getTargetProject() + "\\" + daoConfig.getTargetPackage().replace(".", "\\") + "\\" + fileName + "Mapper.java");
         InputStream input = new FileInputStream(mapperJavaFile);
         String javaStr = MyStringUtils.convertStreamToString(input);
         javaStr = javaStr.substring(javaStr.length() -1) + "List<" + fileName + "> query" + fileName + "List(" + fileName + "Req " + fileNameLower + "Req);\n" +
