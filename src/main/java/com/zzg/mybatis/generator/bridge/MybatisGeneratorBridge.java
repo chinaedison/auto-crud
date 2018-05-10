@@ -194,20 +194,29 @@ public class MybatisGeneratorBridge {
         GeneratedJavaFile entityFile = list.get(0);
         String fileName = entityFile.getFileName().replace(".java", "");
         String str = "package " + modelConfig.getTargetPackage() + ";\n"
-            + "public Class " + fileName + "Req extends " + fileName + " {\n"
-            + "private int start;\n"
-            + "private int limit;\n"
-            + "public int getStart() {\n"
-            + "    return start;\n"
-            + "}\n"
-            + "public void setStart(int start) {\n"
-            + "    this.start = start;\n"
-            + "}\n"
-            + "public int getLimit() {\n"
-            + "    return limit;\n"
-            + "}\n"
-            + "public void setLimit(int limit) {\n"
-            + "    this.limit = limit;\n"
+            + "public class " + fileName + "Req extends " + fileName + " {\n"
+            + "    private Long[] idList;\n"
+            + "    private int start;\n"
+            + "    private int limit;\n"
+            + "    public int getStart() {\n"
+            + "        return start;\n"
+            + "    }\n"
+            + "    public void setStart(int start) {\n"
+            + "        this.start = start;\n"
+            + "    }\n"
+            + "    public int getLimit() {\n"
+            + "        return limit;\n"
+            + "    }\n"
+            + "    public void setLimit(int limit) {\n"
+            + "        this.limit = limit;\n"
+            + "    }\n"
+            + "    public Long[] getIdList() {\n"
+            + "        return idList;\n" +
+                "    }\n" +
+                "\n" +
+                "    public void setIdList(Long[] idList) {\n" +
+                "        this.idList = idList;\n" +
+                "    }"
             + "}\n";
 
         String fileReq = fileName + "Req";
@@ -282,7 +291,6 @@ public class MybatisGeneratorBridge {
         File mapperFile = new File(mapperConfig.getTargetProject() + "\\" + mapperConfig.getTargetPackage().replace(".", "\\") + "\\" + fileName + "Mapper.xml");
         InputStream in = new FileInputStream(mapperFile);
         String xmlStr = MyStringUtils.convertStreamToString(in);
-        System.out.println(xmlStr);
         xmlString = xmlStr.replace("</mapper>", "") + xmlString;
         if (null != xmlString && !"".equals(xmlString)) {
             try {
@@ -301,7 +309,31 @@ public class MybatisGeneratorBridge {
         String fileReqLower = MyStringUtils.toLowerCaseFirstOne(fileReq);
         String controllerStr = "package " + modelConfig.getTargetPackage() + ";\n"
                 + "\nimport " + mapperConfig.getTargetPackage() + "." + fileName +"Mapper;\n"
-                + "\npublic Class " + fileName + "Controller" + " {\n"
+                + "import com.tuniu.asr.intf.entity." + fileName + ";\n" +
+                "import com.tuniu.asr.intf.entity." + fileName + "Req;\n" +
+                "import com.tuniu.operation.platform.tsg.base.core.annotation.Json;\n" +
+                "import com.tuniu.operation.platform.tsg.base.core.utils.JsonUtil;\n" +
+                "import com.tuniu.operation.platform.tsg.base.core.utils.ResponseVo;\n" +
+                "import org.apache.commons.codec.binary.Base64;\n" +
+                "import org.slf4j.Logger;\n" +
+                "import org.slf4j.LoggerFactory;\n" +
+                "import org.springframework.stereotype.Controller;\n" +
+                "import org.springframework.web.bind.annotation.RequestMapping;\n" +
+                "import org.springframework.web.bind.annotation.RequestMethod;\n" +
+                "import org.springframework.web.bind.annotation.ResponseBody;\n" +
+                "\n" +
+                "import javax.annotation.Resource;\n" +
+                "import javax.servlet.http.HttpServletRequest;\n" +
+                "import javax.servlet.http.HttpServletResponse;\n" +
+                "import java.io.IOException;\n" +
+                "import java.io.PrintWriter;\n" +
+                "import java.util.HashMap;\n" +
+                "import java.util.List;\n" +
+                "import java.util.Map;\n" +
+                "\n" +
+                "@Controller\n" +
+                "@RequestMapping(\"/" + fileNameLower + "\")"
+                + "\npublic class " + fileName + "Controller" + " {\n"
                 + "    private static final Logger LOGGER = LoggerFactory.getLogger(" + fileName + "Controller.class);\n"
                 + "\n"
                 + "    @Resource\n"
@@ -326,9 +358,9 @@ public class MybatisGeneratorBridge {
                 + "        responseVo.setSuccess(true);\n"
                 + "    } catch (Exception e) {\n"
                 + "        LOGGER.error(\"查询异常\", e);\n"
-                + "          responseVo.setSuccess(false);\n"
-                + "          responseVo.setMsg(\"查询异常\");\n"
-                + "    }"
+                + "        responseVo.setSuccess(false);\n"
+                + "        responseVo.setMsg(\"查询异常\");\n"
+                + "    }\n"
                 + "    LOGGER.info(\"query" + fileName + "List result:{}\", JsonUtil.toString(responseVo));\n"
                 + "    writer.print(Base64.encodeBase64String(JsonUtil.toString(responseVo).getBytes(\"utf-8\")));\n"
                 + "}\n";
@@ -398,7 +430,7 @@ public class MybatisGeneratorBridge {
 
         controllerStr += "@RequestMapping(value=\"/update\", method = RequestMethod.POST)\n" +
                 "    @ResponseBody\n" +
-                "    public void update" + fileName + "+(@Json " + fileName + " " + fileNameLower + ", HttpServletRequest request,\n" +
+                "    public void update" + fileName + " (@Json " + fileName + " " + fileNameLower + ", HttpServletRequest request,\n" +
                 "                              HttpServletResponse response) throws IOException {\n" +
                 "        PrintWriter writer = null;\n" +
                 "        ResponseVo responseVo = new ResponseVo();\n" +
@@ -423,6 +455,25 @@ public class MybatisGeneratorBridge {
             try {
                 FileWriter fw = new FileWriter(controllerFile);
                 fw.write(controllerStr);
+                fw.flush();
+                fw.close();
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
+
+        File mapperJavaFile = new File(mapperConfig.getTargetProject() + "\\" + mapperConfig.getTargetPackage().replace(".", "\\") + "\\" + fileName + "Mapper.java");
+        InputStream input = new FileInputStream(mapperJavaFile);
+        String javaStr = MyStringUtils.convertStreamToString(input);
+        javaStr = javaStr.substring(javaStr.length() -1) + "List<" + fileName + "> query" + fileName + "List(" + fileName + "Req " + fileNameLower + "Req);\n" +
+                "\n" +
+                "    int query" + fileName + "Count(" + fileName + "Req " + fileNameLower + "Req);\n"
+                + "}";
+        if (null != javaStr && !"".equals(javaStr)) {
+            try {
+                FileWriter fw = new FileWriter(mapperJavaFile);
+                fw.write(javaStr);
                 fw.flush();
                 fw.close();
             } catch (IOException e) {
@@ -557,7 +608,7 @@ public class MybatisGeneratorBridge {
                 "                    </tr>\n" +
                 "                </table>\n" +
                 "            </div>\n" +
-                "            <div id=\"queryTaskList\" style='margin-top:5px;'></div>\n" +
+                "            <div id=\"" + fileNameLower + "List\" style='margin-top:5px;'></div>\n" +
                 "        </fieldset>\n" +
                 "    </div>\n" +
                 "    <div id=\"createContent\" style=\"display:none;\">\n" +
@@ -830,7 +881,7 @@ public class MybatisGeneratorBridge {
                     "     */\n" +
                     "    reloadList: function() {\n" +
                     "        var self = this;\n" +
-                    "        self.queryTaskList.reload(self.buildQueryPram());\n" +
+                    "        self." + fileNameLower + "List.reload(self.buildQueryPram());\n" +
                     "    },\n" +
                     "\n" +
                     "    clearFliterParam: function() {\n" +
@@ -1206,13 +1257,13 @@ public class MybatisGeneratorBridge {
                 "    function getAction() {\n" +
                 "        if (config.devcfg) {\n" +
                 "            return {\n" +
-                "                save: config.protectedSystem.server.ASR + \"queryTask/save\",\n" +
-                "                update: config.protectedSystem.server.ASR + \"queryTask/update\",\n" +
+                "                save: config.protectedSystem.server.ASR + \"" + fileNameLower + "/save\",\n" +
+                "                update: config.protectedSystem.server.ASR + \"" + fileNameLower + "/update\",\n" +
                 "            };\n" +
                 "        } else {\n" +
                 "            return {\n" +
-                "                save: config.protectedSystem.server.ASR + \"queryTask/save\",\n" +
-                "                update: config.protectedSystem.server.ASR + \"queryTask/update\",\n" +
+                "                save: config.protectedSystem.server.ASR + \"" + fileNameLower + "/save\",\n" +
+                "                update: config.protectedSystem.server.ASR + \"" + fileNameLower + "/update\",\n" +
                 "            };\n" +
                 "        }\n" +
                 "\n" +
