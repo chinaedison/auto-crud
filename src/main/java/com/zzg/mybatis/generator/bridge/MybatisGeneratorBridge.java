@@ -638,7 +638,7 @@ public class MybatisGeneratorBridge {
             uedStr += "                    <tr>\n" +
                     "                        <th>" + secondDocLine + ":</th>\n" +
                     "                        <td>\n" +
-                    "                            <input type=\"text\" name=\"" + field.getName() + "\" id=\"" + field.getName() + "\" class=\"input-size validate\" placeholder=\"起始日期\" />\n" +
+                    "                            <input type=\"text\" name=\"" + field.getName() + "\" id=\"" + field.getName() + "\" class=\"input-size validate\" placeholder=\"\" />\n" +
                     "                        </td>\n" +
                     "                    </tr>\n";
         }
