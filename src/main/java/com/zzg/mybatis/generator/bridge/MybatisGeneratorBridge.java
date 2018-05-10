@@ -308,7 +308,7 @@ public class MybatisGeneratorBridge {
         String fileNameLower = MyStringUtils.toLowerCaseFirstOne(fileName);
         String fileReqLower = MyStringUtils.toLowerCaseFirstOne(fileReq);
         String controllerStr = "package " + modelConfig.getTargetPackage() + ";\n"
-                + "\nimport " + mapperConfig.getTargetPackage() + "." + fileName +"Mapper;\n"
+                + "\nimport " + daoConfig.getTargetPackage() + "." + fileName +"Mapper;\n"
                 + "import com.tuniu.asr.intf.entity." + fileName + ";\n" +
                 "import com.tuniu.asr.intf.entity." + fileName + "Req;\n" +
                 "import com.tuniu.operation.platform.tsg.base.core.annotation.Json;\n" +
