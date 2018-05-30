@@ -269,7 +269,7 @@ public class MybatisGeneratorBridge {
                 "" + ele2.getElements().get(2).getFormattedContent(2) + "\n" +
                 "    where 1 = 1\n";
         for (String property: properties.keySet()) {
-            xmlString += "    <if test=\"" + property + " != null\">\n" +
+            xmlString += "    <if test=\"" + property + " != null and " + property + " != ''\">\n" +
                     "      and " + properties.get(property) + " = #{" + property + "}\n" +
                     "    </if>\n";
         }
@@ -282,7 +282,7 @@ public class MybatisGeneratorBridge {
                 "" + ele2.getElements().get(2).getFormattedContent(2) + "\n" +
                 "    where 1 = 1\n";
         for (String property: properties.keySet()) {
-            xmlString += "    <if test=\"" + property + " != null\">\n" +
+            xmlString += "    <if test=\"" + property + " != null and " + property + " != ''\">\n" +
                     "      and " + properties.get(property) + " = #{" + property + "}\n" +
                     "    </if>\n";
         }
@@ -309,8 +309,8 @@ public class MybatisGeneratorBridge {
         String fileReqLower = MyStringUtils.toLowerCaseFirstOne(fileReq);
         String controllerStr = "package " + modelConfig.getTargetPackage() + ";\n"
                 + "\nimport " + daoConfig.getTargetPackage() + "." + fileName +"Mapper;\n"
-                + "import com.tuniu.asr.intf.entity." + fileName + ";\n" +
-                "import com.tuniu.asr.intf.entity." + fileName + "Req;\n" +
+                + "import " + modelConfig.getTargetPackage() +  "." + fileName + ";\n" +
+                "import " + modelConfig.getTargetPackage() +  "." + fileName + "Req;\n" +
                 "import com.tuniu.operation.platform.tsg.base.core.annotation.Json;\n" +
                 "import com.tuniu.operation.platform.tsg.base.core.utils.JsonUtil;\n" +
                 "import com.tuniu.operation.platform.tsg.base.core.utils.ResponseVo;\n" +
@@ -466,7 +466,8 @@ public class MybatisGeneratorBridge {
         File mapperJavaFile = new File(daoConfig.getTargetProject() + "\\" + daoConfig.getTargetPackage().replace(".", "\\") + "\\" + fileName + "Mapper.java");
         InputStream input = new FileInputStream(mapperJavaFile);
         String javaStr = MyStringUtils.convertStreamToString(input);
-        javaStr = javaStr.substring(javaStr.length() -1) + "List<" + fileName + "> query" + fileName + "List(" + fileName + "Req " + fileNameLower + "Req);\n" +
+        javaStr = javaStr.substring(0, javaStr.length() - 2);
+        javaStr += "\n    List<" + fileName + "> query" + fileName + "List(" + fileName + "Req " + fileNameLower + "Req);\n" +
                 "\n" +
                 "    int query" + fileName + "Count(" + fileName + "Req " + fileNameLower + "Req);\n"
                 + "}";
