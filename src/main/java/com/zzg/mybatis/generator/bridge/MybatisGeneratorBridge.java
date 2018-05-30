@@ -467,7 +467,7 @@ public class MybatisGeneratorBridge {
         InputStream input = new FileInputStream(mapperJavaFile);
         String javaStr = MyStringUtils.convertStreamToString(input);
         javaStr = javaStr.substring(0, javaStr.length() - 2);
-        javaStr += "\n    List<" + fileName + "> query" + fileName + "List(" + fileName + "Req " + fileNameLower + "Req);\n" +
+        javaStr += "\n    java.util.List<" + fileName + "> query" + fileName + "List(" + fileName + "Req " + fileNameLower + "Req);\n" +
                 "\n" +
                 "    int query" + fileName + "Count(" + fileName + "Req " + fileNameLower + "Req);\n"
                 + "}";
